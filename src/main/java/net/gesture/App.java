@@ -42,11 +42,11 @@ public class App {
             });
 
             Map<String,Object> map = new HashMap<>();
-            map.put("chocolates", playerList);
+            map.put("playerList", playerList);
 
-            return render(map, "index.handlebars");
+            return render(map, "scoreboard.handlebars");
 
-        }, gson::toJson);
+        });
 
         get("/api/add/player", (req, res) -> {
 
@@ -70,6 +70,11 @@ public class App {
 
             res.redirect("/");
             return null;
+        });
+
+        get("/api/play", (req, res) -> {
+            Map<String, Object> model = new HashMap<>();
+            return render(model, "gesture.handlebars" );
         });
     }
 }
