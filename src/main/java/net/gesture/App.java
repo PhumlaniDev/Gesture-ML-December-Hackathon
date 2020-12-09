@@ -1,6 +1,8 @@
 package net.gesture;
 
 import com.google.gson.Gson;
+import net.gesture.GestureMLService;
+import net.gesture.Player;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import spark.ModelAndView;
@@ -19,6 +21,8 @@ public class App {
     }
 
     public static void main(String[] args) {
+
+        port(getHerokuAssignedPort());
 
         String dbURL = "jdbc:postgresql:GestureMLDB";
 
@@ -76,5 +80,13 @@ public class App {
             Map<String, Object> model = new HashMap<>();
             return render(model, "gesture.handlebars" );
         });
+    }
+
+    static int getHerokuAssignedPort() {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        if (processBuilder.environment().get("PORT") != null) {
+            return Integer.parseInt(processBuilder.environment().get("PORT"));
+        }
+        return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
     }
 }
