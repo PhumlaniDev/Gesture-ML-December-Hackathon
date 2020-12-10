@@ -1,0 +1,21 @@
+{{> header.handlebars}}
+<div class="text-center mx-auto">
+    <h1>Move Makers Leaderboard</h1>
+    <table class="table table-light table-striped table-hover">
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Age</th>
+        </tr>
+        {{#each playerList}}
+            <tr class="m-3">
+                <td>{{playerId}}</td>
+                <td>{{playerName}}</td>
+                <td>{{playerAge}}</td>
+            </tr>
+        {{/each}}
+    </table>
+
+
+</div>
+{{> footer.handlebars}}
