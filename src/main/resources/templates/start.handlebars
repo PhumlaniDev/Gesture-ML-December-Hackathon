@@ -5,14 +5,30 @@
     <div>
 
         <div>
-            <div id="position-yourself" class="mb-3"></div>
+            <div id="position-yourself" class="mb-3">1. Align yourself with device camera</div>
         </div>
 
         <div class="controls">
-            <div class="question gesture mb-3"></div>
+            <h1 class="question gesture mb-3"></h1>
         </div>
         <div class="controls mb-3">
-            <div id="question" class="question"></div>
+            <h1 id="question" class="question"></h1>
+        </div>
+        <div class="row">
+            <div id="correct-toggle" class=" col-lg-10 offset-lg-1 card text-white bg-success my-3 mx-auto p-5"
+                 style="max-width: 18rem;">
+                <div id="correct-toggle-header">
+                    <h1 class="p-4">Correct!</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div id="incorrect-toggle" class="col-lg-10 offset-lg-1  card text-white bg-danger my-3 mx-auto p-5"
+                 style="max-width: 18rem;">
+                <div id="incorrect-toggle-header">
+                    <h1 class="p-4">Incorrect!</h1>
+                </div>
+            </div>
         </div>
 
 
@@ -24,34 +40,15 @@
                 </canvas>
             </div>
 
-<!--            <div id="label-container"></div>-->
+            <!--            <div id="label-container"></div>-->
 
             <div class="controls mb-2 text-center">
-                <button id="start-button" type="button" class="start btn btn-success mx-auto" >Start</button>
+                <button id="start-button" type="button" class="start btn btn-success mx-auto">Start</button>
                 <button id="stop" type="button" class="stop btn btn-danger mx-auto">Stop</button>
                 <button id="restart" type="button" class="restart btn btn-primary mx-auto">Restart</button>
             </div>
 
         </div>
-
-
-        <div class="row">
-            <div id="correct-toggle" class="card text-white bg-success my-3 mx-auto" style="max-width: 18rem;">
-                <div class="card-header">Header</div>
-                <div class="card-body">
-                    <h5 class="card-title">Success card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                </div>
-            </div>
-            <div id="incorrect-toggle" class="card text-white bg-danger my-3" style="max-width: 18rem;">
-                <div class="card-header">Header</div>
-                <div class="card-body">
-                    <h5 class="card-title">Danger card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                </div>
-            </div>
-        </div>
-
 
 
     </div>

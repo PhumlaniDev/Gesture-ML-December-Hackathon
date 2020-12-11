@@ -51,6 +51,4 @@ CREATE TABLE Scores (
 	score_id serial PRIMARY KEY,
 	player_id int not null,
 	foreign key (player_id) references Player(player_id),
-	question_id int not null,
-	foreign key (question_id) references Question(question_id)
 );

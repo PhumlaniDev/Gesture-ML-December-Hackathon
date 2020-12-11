@@ -15,4 +15,7 @@ public interface GestureService {
     @SqlUpdate("insert into Player(player_name, player_age) values (?,?)")
     void addPlayer(String name, int age);
 
+    @SqlUpdate("insert into scores (player_id) values (?)")
+    void addScore(int playerID);
+
 }

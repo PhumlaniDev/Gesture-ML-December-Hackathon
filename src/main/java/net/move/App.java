@@ -85,8 +85,8 @@ public class App {
                System.out.println(age);
 
                jdbi.useHandle(h -> {
-                   GestureService chocolateService = h.attach(GestureService.class);
-                   chocolateService.addPlayer(name, age);
+                   GestureService gestureService = h.attach(GestureService.class);
+                   gestureService.addPlayer(name, age);
                });
 
                res.redirect("/start");

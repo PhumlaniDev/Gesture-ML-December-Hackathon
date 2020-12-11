@@ -2,18 +2,21 @@
 // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/pose
 
 // the link to your model provided by Teachable Machine export panel
-window.addEventListener("DOMContentLoaded",function(){
+window.addEventListener("DOMContentLoaded", function () {
 
-//    const bell = new Audio('audio/bell.mp3');
-    //const jinglebells = new Audio('audio/jinglebells.mp3');
-//    const error = new Audio('audio/error.mp3');
+    const bell = new Audio('audio/bell.mp3');
+    const jinglebells = new Audio('audio/jinglebells.mp3');
+    const error = new Audio('audio/error.mp3');
 
+ const URL ="https://teachablemachine.withgoogle.com/models/C8EwO48qN/"
 
-    const URL = "https://teachablemachine.withgoogle.com/models/Ybj48BAov/";
+//    const URL = "https://teachablemachine.withgoogle.com/models/Ybj48BAov/";
     let model, webcam, ctx, labelContainer, maxPredictions;
 
     const correctElement = document.getElementById("correct-toggle");
     const incorrectElement = document.getElementById("incorrect-toggle");
+    const correctHeaderElement = document.getElementById("correct-toggle-header");
+    const incorrectHeaderElement = document.getElementById("incorrect-toggle-header");
 
     const alignTextElem = document.getElementById("position-yourself");
 
@@ -22,6 +25,10 @@ window.addEventListener("DOMContentLoaded",function(){
     const stopBtn = document.getElementById("stop");
     const questionElem = document.getElementById("question");
     const restartBtn = document.getElementById("restart");
+
+
+    const showMeList = ["Hungry", "I See You", "Quiet Down", "Get Busy"]
+    let lookingForIndex = 0
 
 
     async function init() {
@@ -35,7 +42,7 @@ window.addEventListener("DOMContentLoaded",function(){
         maxPredictions = model.getTotalClasses();
 
         // Convenience function to setup a webcam
-        const size = 250;
+        const size = 300;
         const flip = true; // whether to flip the webcam
         webcam = new tmPose.Webcam(size, size, flip); // width, height, flip
         await webcam.setup(); // request access to the webcam
@@ -48,17 +55,20 @@ window.addEventListener("DOMContentLoaded",function(){
         canvas.style.display = "block";
         canvas.classList.add("mx-auto")
 
-        canvas.width = size; canvas.height = size;
+        canvas.width = size;
+        canvas.height = size;
         ctx = canvas.getContext("2d");
-         labelContainer = document.getElementById("webcam-container");
+        labelContainer = document.getElementById("webcam-container");
 
         for (let i = 0; i < maxPredictions; i++) { // and class labels
             labelContainer.appendChild(document.createElement("div"));
         }
-         startBtn.style.display = "none";
-         stopBtn.style.display = "block";
+        startBtn.style.display = "none";
+        stopBtn.style.display = "block";
 
     }
+
+
 
     async function loop(timestamp) {
         webcam.update(); // update the webcam frame
@@ -69,18 +79,34 @@ window.addEventListener("DOMContentLoaded",function(){
     async function predict() {
         // Prediction #1: run input through posenet
         // estimatePose can take in an image, video or canvas html element
-        const { pose, posenetOutput } = await model.estimatePose(webcam.canvas);
+        const {
+            pose,
+            posenetOutput
+        } = await model.estimatePose(webcam.canvas);
         // Prediction 2: run input through teachable machine classification model
         const prediction = await model.predict(posenetOutput);
 
-        for (let i = 0; i < maxPredictions; i++) {
-            const classPrediction =
-                prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-            labelContainer.childNodes[i].innerHTML = classPrediction;
-        }
+        let highestProbability = 0;
+        let gestureName = "";
+
 
         // finally draw the poses
         drawPose(pose);
+
+        for (let i = 0; i < maxPredictions; i++) {
+            //            const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+            //            labelContainer.childNodes[i].innerHTML = classPrediction;
+
+            if (prediction[i].probability > highestProbability) {
+                highestProbability = prediction[i].probability;
+                gestureName = prediction[i].className;
+            }
+        }
+
+        if (highestProbability < 1.00) {
+            return;
+        }
+        checkForGestureThrottled(gestureName);
     }
 
     function drawPose(pose) {
@@ -98,65 +124,60 @@ window.addEventListener("DOMContentLoaded",function(){
     async function stop() {
         await webcam.stop();
         document.getElementById("canvas").style.display = "none";
-
         startBtn.style.display = "block";
         stopBtn.style.display = "none";
     }
 
+    setTimeout(async function () {
+        const showMeList = ["Hungry", "I See You", "Quiet Down", "Get Busy"]
+        let lookingForIndex = 0
+        questionElem.innerHTML = "Make the gesture for " + showMeList[lookingForIndex];
+    }, 8000);
 
-
-    setTimeout(function(){
-        const showMeList = ["Hungry", "I see you", "Quiet down", "Get Busy"]
-         let lookingForIndex = 2
-         questionElem.innerHTML = "Make the gesture for " + showMeList[lookingForIndex];
-    }, 10000);
-
-    setTimeout(function(){
-       alignTextElem.innerHTML = "";
+    setTimeout(function () {
+        alignTextElem.innerHTML = "";
     }, 3000);
 
-    window.addEventListener("load",function(){
+    window.addEventListener("load", function () {
 
-       correctElement.style.display = "none";
-       incorrectElement.style.display = "none";
+        correctElement.style.display = "none";
+        incorrectElement.style.display = "none";
 
-       restartBtn.style.display = "none";
-       stopBtn.style.display = "none";
+        restartBtn.style.display = "none";
+        stopBtn.style.display = "none";
 
-       setTimeout(function(){
-           alignTextElem.innerHTML = "";
-       }, 3000);
+        setTimeout(function () {
+            alignTextElem.innerHTML = "";
+        }, 3000);
     })
 
-    restartBtn.addEventListener("click", function () {
-        lookingForIndex = -1;
-        toggleVisibility(restartButton);
-        showChocolateQuestion();
+    restartBtn.addEventListener("click", async function () {
+        await stop()
+        lookingForIndex = 0;
+        restartBtn.style.display = "none";
+        await init()
     });
 
-    startBtn.addEventListener("click", function () {
-       init();
-       startBtn.style.display = "none";
-       stopBtn.style.display = "block";
+    startBtn.addEventListener("click", async function () {
+        await init();
+        startBtn.style.display = "none";
+        stopBtn.style.display = "block";
     });
 
-    stopBtn.addEventListener("click", function () {
+    stopBtn.addEventListener("click", async function () {
 
         startBtn.style.display = "block";
+        correctElement.style.display = "none"
+        incorrectElement.style.display = "none"
+        questionElem.style.display = "none";
         stopBtn.style.display = "none";
-        stop();
-
+        await stop();
     });
-
-
-
-
-
 
 
     function GestureGame() {
 
-        const showMeList = ["Hungry", "I see you", "Quiet down", "Get Busy"]
+        const showMeList = ["Hungry", "I See You", "Quiet Down", "Get Busy"]
         let lookingForIndex = 0;
 
         function getQuestion() {
@@ -165,23 +186,61 @@ window.addEventListener("DOMContentLoaded",function(){
 
     }
 
-    function checkForGesture(gesture) {
+    function getModelName(gestureName){
+        switch(gestureName){
+            case "ISeeYou":
+                return "I See You"
+                break;
+            case "GetBusy":
+                return "Get Busy"
+                break;
+            case "QuietDown":
+                return "Quiet Down"
+                break;
+            default:
+                return gestureName
+        }
+    }
+
+    async function checkForGesture(gesture) {
+
         if (gesture !== "Nothing") {
             const lookingFor = currentlyLookingFor();
-            if (lookingFor !== "" && gesture === lookingFor) {
-                console.log("=================================================");
-                webcam.pause();
-                gestureElem.innerHTML = "Perfect, you made the correct gesture for "+lookingFor;
+            if (lookingFor !== "" && getModelName(gesture) === lookingFor) {
+                await webcam.pause();
                 bell.play();
+
+                incorrectElement.style.display = "none"
+                correctElement.style.display = "block"
+                correctHeaderElement.innerHTML = "Perfect, you made the correct gesture for " + lookingFor;
+
                 gesture = "Nothing";
 
                 setTimeout(function () {
-                    showChocolateQuestion()
-                    gestureElem.innerHTML = ""
-                    webcam.play();
-                }, 2500);
+                  correctElement.style.display = "none";
+                  incorrectElement.style.display = "none"
+                }, 4000);
+
+                setTimeout(function () {
+                  alignTextElem.style.display = "block";
+                }, 4300);
+
+//                setTimeout(async function () {
+//                alignTextElem.style.display = "none";
+////                    await webcam.play();
+//                }, 5000);
+
+                    await showGestureQuestion()
+
+
             } else {
-                error.play();
+
+                    if(lookingForIndex<4){
+                        incorrectElement.style.display = "block"
+                        incorrectHeaderElement.innerHTML = "Try making a gesture for " + lookingFor;
+                        error.play();
+                    }
+
             }
         }
     }
@@ -198,16 +257,17 @@ window.addEventListener("DOMContentLoaded",function(){
         return "";
     }
 
-    function showGestureQuestion() {
-
+    async function showGestureQuestion()  {
         lookingForIndex++;
         if (lookingForIndex < showMeList.length) {
-            questionElem.innerHTML = "Please make a gesture for" + currentlyLookingFor();
+            questionElem.innerHTML = "Try making a gesture for showing " + currentlyLookingFor();
+            await webcam.play()
         } else {
-            questionElem.innerHTML = "You know your gestures!";
-    //        jinglebells.play();
-    // do something
-            toggleVisibility(restartButton)
+            questionElem.innerHTML = "Congratulations! You know your gestures!"
+            await stop();
+            restartBtn.style.display = "none";
+            startBtn.style.display = "none";
+            //        jinglebells.play();
         }
     }
 
