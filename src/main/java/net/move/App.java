@@ -58,7 +58,7 @@ public class App {
        try {
            port(getHerokuAssignedPort());
 
-           String dbURL = "jdbc:postgresql://localhost/GestureMLDB?user=konvi-dev&password=coder123";
+           String dbURL = "jdbc:postgresql://localhost/GestureMLDB?user=coder-dev&password=coder123";
 
            Jdbi jdbi = getJdbiDatabaseConnection(dbURL);
            jdbi.installPlugin(new SqlObjectPlugin());
@@ -118,6 +118,4 @@ public class App {
        }
 
     }
-
-
 }
